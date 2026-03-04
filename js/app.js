@@ -86,10 +86,10 @@ function getDummyData(action) {
     if (action === 'getDesa') {
         return {
             id_desa: 1,
-            nama_desa: 'Desa Sukamaju',
-            kecamatan: 'Kecamatan Makmur',
-            kabupaten: 'Kabupaten Sejahtera',
-            tahun: 2024,
+            nama_desa: 'Desa Wonokerso',
+            kecamatan: 'Kecamatan Pakisaji',
+            kabupaten: 'Kabupaten Malang',
+            tahun: 2026,
             total_anggaran: 1500000000
         };
     } else if (action === 'getPrograms') {
