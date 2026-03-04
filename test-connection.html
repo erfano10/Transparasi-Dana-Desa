@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Koneksi Google Apps Script</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h1 class="text-2xl font-bold mb-4">🔍 Test Koneksi Google Apps Script</h1>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-2">URL Google Apps Script:</label>
+                <input type="text" id="scriptUrl" 
+                       class="w-full px-4 py-2 border rounded-lg font-mono text-sm"
+                       placeholder="https://script.google.com/macros/s/.../exec">
+            </div>
+            
+            <div class="flex space-x-4 mb-6">
+                <button onclick="testGetDesa()" 
+                        class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600">
+                    Test getDesa
+                </button>
+                <button onclick="testGetPrograms()" 
+                        class="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600">
+                    Test getPrograms
+                </button>
+                <button onclick="loadFromConfig()" 
+                        class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600">
+                    Load dari app.js
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-bold mb-4">📊 Hasil Test:</h2>
+            <div id="result" class="bg-gray-50 p-4 rounded-lg font-mono text-sm overflow-auto max-h-96">
+                <p class="text-gray-500">Klik tombol test untuk melihat hasil...</p>
+            </div>
+        </div>
+
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mt-6">
+            <h3 class="font-bold mb-2">📝 Cara Menggunakan:</h3>
+            <ol class="list-decimal list-inside space-y-1 text-sm">
+                <li>Paste URL Google Apps Script Anda di kotak input</li>
+                <li>Klik "Test getDesa" untuk test data desa</li>
+                <li>Klik "Test getPrograms" untuk test data program</li>
+                <li>Lihat hasil di kotak bawah</li>
+                <li>Jika ada error, screenshot dan kirim ke developer</li>
+            </ol>
+        </div>
+
+        <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mt-4">
+            <h3 class="font-bold mb-2">✅ Hasil yang Diharapkan:</h3>
+            <p class="text-sm mb-2">Status harus "success" dan data harus sesuai dengan spreadsheet Anda</p>
+            <pre class="bg-white p-2 rounded text-xs overflow-auto">{
+  "status": "success",
+  "message": "Success",
+  "data": {
+    "id_desa": 1,
+    "nama_desa": "Nama Desa Anda",
+    ...
+  }
+}</pre>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        function loadFromConfig() {
+            const url = CONFIG.SPREADSHEET_URL;
+            document.getElementById('scriptUrl').value = url;
+            showResult('info', 'URL loaded from app.js: ' + url);
+        }
+
+        async function testGetDesa() {
+            const url = document.getElementById('scriptUrl').value;
+            if (!url) {
+                showResult('error', 'Masukkan URL terlebih dahulu!');
+                return;
+            }
+
+            showResult('loading', 'Testing getDesa...');
+
+            try {
+                const testUrl = url + '?action=getDesa';
+                console.log('Testing URL:', testUrl);
+
+                const response = await fetch(testUrl);
+                const data = await response.json();
+
+                console.log('Response:', data);
+
+                if (data.status === 'success') {
+                    showResult('success', 'getDesa berhasil!', data);
+                } else {
+                    showResult('error', 'getDesa gagal: ' + data.message, data);
+                }
+            } catch (error) {
+                showResult('error', 'Error: ' + error.message, { error: error.toString() });
+            }
+        }
+
+        async function testGetPrograms() {
+            const url = document.getElementById('scriptUrl').value;
+            if (!url) {
+                showResult('error', 'Masukkan URL terlebih dahulu!');
+                return;
+            }
+
+            showResult('loading', 'Testing getPrograms...');
+
+            try {
+                const testUrl = url + '?action=getPrograms';
+                console.log('Testing URL:', testUrl);
+
+                const response = await fetch(testUrl);
+                const data = await response.json();
+
+                console.log('Response:', data);
+
+                if (data.status === 'success') {
+                    const count = data.data ? data.data.length : 0;
+                    showResult('success', `getPrograms berhasil! Ditemukan ${count} program`, data);
+                } else {
+                    showResult('error', 'getPrograms gagal: ' + data.message, data);
+                }
+            } catch (error) {
+                showResult('error', 'Error: ' + error.message, { error: error.toString() });
+            }
+        }
+
+        function showResult(type, message, data = null) {
+            const resultDiv = document.getElementById('result');
+            
+            let bgColor = 'bg-gray-50';
+            let icon = '📋';
+            
+            if (type === 'success') {
+                bgColor = 'bg-green-50';
+                icon = '✅';
+            } else if (type === 'error') {
+                bgColor = 'bg-red-50';
+                icon = '❌';
+            } else if (type === 'loading') {
+                bgColor = 'bg-blue-50';
+                icon = '⏳';
+            } else if (type === 'info') {
+                bgColor = 'bg-blue-50';
+                icon = 'ℹ️';
+            }
+
+            let html = `
+                <div class="${bgColor} p-4 rounded-lg mb-2">
+                    <p class="font-bold">${icon} ${message}</p>
+                </div>
+            `;
+
+            if (data) {
+                html += `
+                    <div class="bg-white p-4 rounded-lg border">
+                        <p class="font-bold mb-2">Response Data:</p>
+                        <pre class="whitespace-pre-wrap break-words">${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            }
+
+            resultDiv.innerHTML = html;
+        }
+
+        // Auto load URL from config on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadFromConfig();
+        });
+    </script>
+</body>
+</html>

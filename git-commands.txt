@@ -1,0 +1,37 @@
+# Git Commands untuk Upload ke GitHub
+
+## Jika belum punya Git, download di: https://git-scm.com/
+
+## Langkah-langkah:
+
+# 1. Buka terminal/command prompt di folder project ini
+
+# 2. Inisialisasi Git
+git init
+
+# 3. Tambahkan semua file
+git add .
+
+# 4. Commit pertama
+git commit -m "Initial commit: Sistem Transparansi Dana Desa"
+
+# 5. Tambahkan remote repository
+# GANTI 'USERNAME' dengan username GitHub Anda!
+git remote add origin https://github.com/USERNAME/sistem-transparansi-dana-desa.git
+
+# 6. Push ke GitHub
+git branch -M main
+git push -u origin main
+
+# Jika diminta username & password:
+# - Username: username GitHub Anda
+# - Password: gunakan Personal Access Token (bukan password biasa)
+#   Cara buat token: https://github.com/settings/tokens
+
+## Untuk update nanti (setelah edit file):
+
+git add .
+git commit -m "Update: deskripsi perubahan"
+git push
+
+## Selesai! File sudah ter-upload ke GitHub
